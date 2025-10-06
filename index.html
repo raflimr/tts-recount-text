@@ -2,24 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Crossword Puzzle: Recount Text</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0"/>
+    <title>Crossword Puzzle: Recount Text - Mobile Friendly</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <style>
         :root {
             --cell-size: 2.5rem;
+            --cell-size-mobile: 2rem;
+            --cell-size-small: 1.75rem;
             --border-color: #9ca3af;
             --primary-color: #3b82f6;
             --success-color: #22c55e;
             --error-color: #ef4444;
+            --grid-gap: 1px;
+        }
+
+        /* Mobile-first responsive breakpoints */
+        @media (max-width: 768px) {
+            :root {
+                --cell-size: var(--cell-size-mobile);
+            }
+        }
+
+        @media (max-width: 480px) {
+            :root {
+                --cell-size: var(--cell-size-small);
+            }
         }
 
         body { 
             font-family: 'Inter', sans-serif; 
             -webkit-touch-callout: none; 
             -webkit-user-select: none; 
-            user-select: none; 
+            user-select: none;
+            /* Improve mobile scrolling */
+            -webkit-overflow-scrolling: touch;
+            overflow-x: hidden;
         }
 
         .grid-cell { 
@@ -33,11 +52,29 @@
             caret-color: var(--primary-color); 
             border-radius: 0.25rem; 
             transition: all 0.2s ease;
+            /* Mobile touch improvements */
+            -webkit-appearance: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        /* Mobile font size adjustment */
+        @media (max-width: 768px) {
+            .grid-cell {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .grid-cell {
+                font-size: 0.875rem;
+            }
         }
 
         .grid-cell:focus { 
             outline: 2px solid var(--primary-color); 
             z-index: 10; 
+            transform: scale(1.05);
         }
 
         .grid-cell.empty { 
@@ -58,20 +95,32 @@
             position: absolute; 
             top: 1px; 
             left: 2px; 
-            font-size: 0.65rem; 
+            font-size: 0.6rem; 
             font-weight: 600; 
             color: #4b5563; 
             pointer-events: none; 
         }
 
+        @media (max-width: 480px) {
+            .cell-number {
+                font-size: 0.5rem;
+                top: 0px;
+                left: 1px;
+            }
+        }
+
         .clue-item { 
             transition: all 0.2s ease; 
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            padding: 0.75rem;
+            margin: 0.25rem 0;
         }
 
         .clue-item:hover, 
         .clue-item.active { 
             background-color: #eff6ff; 
-            cursor: pointer; 
+            border-radius: 0.5rem;
         }
 
         .cell-highlight { 
@@ -93,45 +142,131 @@
             color: #991b1b; 
             border-color: var(--error-color); 
         }
+
+        /* Mobile navigation improvements */
+        .mobile-nav {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 20;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 0.5rem 0;
+        }
+
+        /* Scrollable grid container */
+        .grid-scroll-container {
+            max-width: 100vw;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 1rem;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Custom scrollbar for mobile */
+        .grid-scroll-container::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .grid-scroll-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 2px;
+        }
+
+        .grid-scroll-container::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 2px;
+        }
+
+        /* Button improvements for mobile */
+        .mobile-btn {
+            min-height: 44px; /* iOS minimum touch target */
+            min-width: 44px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Responsive text sizing */
+        @media (max-width: 640px) {
+            .responsive-text-lg { font-size: 1.125rem; }
+            .responsive-text-xl { font-size: 1.25rem; }
+        }
+
+        /* Virtual keyboard handling */
+        @media screen and (max-height: 500px) {
+            .main-container {
+                padding: 0.5rem;
+            }
+            
+            .clue-container {
+                max-height: 200px;
+                overflow-y: auto;
+            }
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 flex items-center justify-center min-h-screen p-4">
-    <div class="w-full max-w-6xl mx-auto bg-white p-4 sm:p-6 lg:p-8 rounded-2xl shadow-lg">
-        <header class="text-center mb-6">
-            <h1 class="text-3xl sm:text-4xl font-bold text-slate-900">Crossword Puzzle</h1>
-            <p class="text-slate-500 mt-1">Theme: Recount Text</p>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+    <!-- Mobile Navigation -->
+    <div class="mobile-nav lg:hidden">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-lg font-bold text-slate-900">Crossword Puzzle</h1>
+                <button id="mobile-menu-btn" class="p-2 text-slate-600 hover:text-slate-900">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container w-full max-w-6xl mx-auto p-2 lg:p-8">
+        <header class="text-center mb-4 lg:mb-6 hidden lg:block">
+            <h1 class="text-2xl lg:text-4xl font-bold text-slate-900">Crossword Puzzle</h1>
+            <p class="text-slate-500 mt-1 text-sm lg:text-base">Theme: Recount Text</p>
         </header>
 
-        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div id="grid-container" class="lg:col-span-2 flex justify-center items-center">
-                <div id="crossword-grid" class="grid" style="grid-template-columns: repeat(20, 2.5rem); grid-template-rows: repeat(20, 2.5rem);">
-                    <!-- JS will render cells -->
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8">
+            <!-- Clues Section - Shows first on mobile -->
+            <div id="clues-container" class="w-full order-1 lg:order-2 bg-white rounded-lg shadow-sm border lg:border-0 lg:bg-transparent lg:shadow-none">
+                <div class="p-3 lg:p-0">
+                    <div class="mb-4 lg:mb-6">
+                        <h2 class="text-base lg:text-xl font-bold border-b-2 border-slate-200 pb-2 mb-3 text-slate-700 responsive-text-lg">ACROSS</h2>
+                        <ul id="across-clues" class="space-y-1 lg:space-y-2 text-xs lg:text-sm max-h-40 lg:max-h-none overflow-y-auto clue-container"></ul>
+                    </div>
+                    <div>
+                        <h2 class="text-base lg:text-xl font-bold border-b-2 border-slate-200 pb-2 mb-3 text-slate-700 responsive-text-lg">DOWN</h2>
+                        <ul id="down-clues" class="space-y-1 lg:space-y-2 text-xs lg:text-sm max-h-40 lg:max-h-none overflow-y-auto clue-container"></ul>
+                    </div>
                 </div>
             </div>
 
-            <div id="clues-container" class="w-full">
-                <div class="mb-6">
-                    <h2 class="text-xl font-bold border-b-2 border-slate-200 pb-2 mb-3 text-slate-700">ACROSS</h2>
-                    <ul id="across-clues" class="space-y-2 text-sm"></ul>
-                </div>
-                <div>
-                    <h2 class="text-xl font-bold border-b-2 border-slate-200 pb-2 mb-3 text-slate-700">DOWN</h2>
-                    <ul id="down-clues" class="space-y-2 text-sm"></ul>
+            <!-- Grid Section -->
+            <div id="grid-container" class="lg:col-span-2 order-2 lg:order-1">
+                <div class="grid-scroll-container">
+                    <div id="crossword-grid" class="grid mx-auto" style="grid-template-columns: repeat(20, var(--cell-size)); grid-template-rows: repeat(20, var(--cell-size)); gap: var(--grid-gap);">
+                        <!-- JS will render cells -->
+                    </div>
                 </div>
             </div>
         </main>
 
-        <footer class="mt-8 flex justify-center items-center gap-4 flex-wrap">
-            <button id="check-btn" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg">Check Answers</button>
-            <button id="reveal-btn" class="px-5 py-2.5 bg-green-600 text-white rounded-lg">Reveal Answers</button>
-            <button id="reset-btn" class="px-5 py-2.5 bg-red-600 text-white rounded-lg">Reset</button>
+        <!-- Control Buttons -->
+        <footer class="mt-4 lg:mt-8 flex justify-center items-center gap-2 lg:gap-4 flex-wrap px-2">
+            <button id="check-btn" class="mobile-btn flex-1 lg:flex-initial px-3 lg:px-5 py-2 lg:py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs lg:text-base transition-colors">Check</button>
+            <button id="reveal-btn" class="mobile-btn flex-1 lg:flex-initial px-3 lg:px-5 py-2 lg:py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs lg:text-base transition-colors">Reveal</button>
+            <button id="reset-btn" class="mobile-btn flex-1 lg:flex-initial px-3 lg:px-5 py-2 lg:py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs lg:text-base transition-colors">Reset</button>
         </footer>
+
+        <!-- Mobile Instructions -->
+        <div class="mt-4 text-center text-xs text-slate-500 lg:hidden">
+            <p>Tap a clue to highlight the word • Use keyboard to navigate • Pinch to zoom</p>
+        </div>
     </div>
 
 <script>
 /**
- * Crossword Puzzle Application
- * A responsive crossword puzzle focused on Recount Text theme
+ * Mobile-Friendly Crossword Puzzle Application
+ * Responsive crossword puzzle with touch support and mobile optimizations
  */
 class CrosswordPuzzle {
     constructor() {
@@ -144,6 +279,12 @@ class CrosswordPuzzle {
                 CELL_CORRECT: 'cell-correct', 
                 CELL_INCORRECT: 'cell-incorrect',
                 CLUE_ACTIVE: 'active'
+            },
+            MOBILE: {
+                BREAKPOINT: 768,
+                SMALL_BREAKPOINT: 480,
+                CELL_SIZE: '2rem',
+                CELL_SIZE_SMALL: '1.75rem'
             }
         };
 
@@ -171,7 +312,8 @@ class CrosswordPuzzle {
             downClues: document.getElementById('down-clues'),
             checkBtn: document.getElementById('check-btn'),
             revealBtn: document.getElementById('reveal-btn'),
-            resetBtn: document.getElementById('reset-btn')
+            resetBtn: document.getElementById('reset-btn'),
+            mobileMenuBtn: document.getElementById('mobile-menu-btn')
         };
 
         // State management
@@ -182,8 +324,77 @@ class CrosswordPuzzle {
         this.allInputs = [];
         this.activeDirection = this.CONFIG.DIRECTIONS.ACROSS;
 
+        // Mobile detection and responsive handling
+        this.isMobile = this.detectMobile();
+        this.setupResponsiveHandling();
+
         // Initialize the puzzle
         this.init();
+    }
+
+    /**
+     * Detect if device is mobile
+     */
+    detectMobile() {
+        return window.innerWidth <= this.CONFIG.MOBILE.BREAKPOINT || 
+               /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    /**
+     * Setup responsive handling and resize listeners
+     */
+    setupResponsiveHandling() {
+        // Handle window resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                this.isMobile = this.detectMobile();
+                this.updateGridForMobile();
+            }, 250);
+        });
+
+        // Handle orientation change on mobile
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                this.isMobile = this.detectMobile();
+                this.updateGridForMobile();
+            }, 100);
+        });
+
+        // Prevent zoom on double tap for mobile
+        if (this.isMobile) {
+            document.addEventListener('touchend', (e) => {
+                const now = new Date().getTime();
+                const timeSince = now - (this.lastTap || 0);
+                if (timeSince < 300 && timeSince > 0) {
+                    e.preventDefault();
+                }
+                this.lastTap = now;
+            });
+        }
+    }
+
+    /**
+     * Update grid for mobile responsiveness
+     */
+    updateGridForMobile() {
+        const gridElement = this.elements.grid;
+        let cellSize;
+        
+        if (window.innerWidth <= this.CONFIG.MOBILE.SMALL_BREAKPOINT) {
+            cellSize = this.CONFIG.MOBILE.CELL_SIZE_SMALL;
+        } else if (window.innerWidth <= this.CONFIG.MOBILE.BREAKPOINT) {
+            cellSize = this.CONFIG.MOBILE.CELL_SIZE;
+        } else {
+            cellSize = '2.5rem';
+        }
+        
+        gridElement.style.gridTemplateColumns = `repeat(20, ${cellSize})`;
+        gridElement.style.gridTemplateRows = `repeat(20, ${cellSize})`;
+        
+        // Update CSS custom property
+        document.documentElement.style.setProperty('--cell-size', cellSize);
     }
 
     /**
@@ -194,6 +405,7 @@ class CrosswordPuzzle {
         this.placeWords();
         this.renderGrid();
         this.attachEventListeners();
+        this.updateGridForMobile();
     }
 
     /**
@@ -256,9 +468,9 @@ class CrosswordPuzzle {
      */
     createClueElement(word) {
         const li = document.createElement('li');
-        li.className = 'p-2 rounded-md transition-colors duration-200 clue-item';
+        li.className = 'clue-item rounded-md transition-colors duration-200';
         li.dataset.wordNum = word.num;
-        li.innerHTML = `<span class="font-bold">${word.num}.</span> ${word.hint}`;
+        li.innerHTML = `<span class="font-bold text-blue-600">${word.num}.</span> <span class="text-slate-700">${word.hint}</span>`;
         
         const targetContainer = word.direction === this.CONFIG.DIRECTIONS.ACROSS 
             ? this.elements.acrossClues 
@@ -316,10 +528,27 @@ class CrosswordPuzzle {
         input.dataset.row = row;
         input.dataset.col = col;
         input.autocomplete = 'off';
+        input.inputMode = 'text'; // Better mobile keyboard
         
+        // Input validation and formatting
         input.addEventListener('input', (e) => {
             e.target.value = e.target.value.replace(/[^A-Za-z]/g, '').toUpperCase();
         });
+
+        // Touch handling for mobile
+        if (this.isMobile) {
+            input.addEventListener('touchstart', (e) => {
+                // Prevent zoom on focus for iOS
+                e.target.style.fontSize = '16px';
+            }, { passive: true });
+
+            input.addEventListener('blur', (e) => {
+                // Reset font size after blur
+                setTimeout(() => {
+                    e.target.style.fontSize = '';
+                }, 100);
+            });
+        }
         
         return input;
     }
@@ -351,21 +580,54 @@ class CrosswordPuzzle {
             input.addEventListener('input', (e) => this.handleInput(e));
             input.addEventListener('keydown', (e) => this.handleKeyDown(e));
             input.addEventListener('focus', (e) => this.handleFocus(e));
+            
+            // Mobile-specific touch events
+            if (this.isMobile) {
+                input.addEventListener('touchend', (e) => this.handleTouch(e), { passive: true });
+            }
         });
 
-        // Clue click listeners
+        // Clue click listeners with better mobile handling
         document.querySelectorAll('.clue-item').forEach(item => {
-            item.addEventListener('click', (e) => this.handleClueClick(e));
+            if (this.isMobile) {
+                item.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.handleClueClick(e);
+                }, { passive: false });
+            } else {
+                item.addEventListener('click', (e) => this.handleClueClick(e));
+            }
         });
 
         // Button listeners
         this.elements.checkBtn.addEventListener('click', () => this.checkAnswers());
         this.elements.revealBtn.addEventListener('click', () => this.revealAnswers());
         this.elements.resetBtn.addEventListener('click', () => this.resetGrid());
+
+        // Mobile menu toggle (if implemented)
+        if (this.elements.mobileMenuBtn) {
+            this.elements.mobileMenuBtn.addEventListener('click', () => this.toggleMobileMenu());
+        }
     }
 
     /**
-     * Highlight word and its corresponding clue
+     * Handle touch events on mobile
+     */
+    handleTouch(e) {
+        // Focus the input on touch
+        e.target.focus();
+    }
+
+    /**
+     * Toggle mobile menu (placeholder for future implementation)
+     */
+    toggleMobileMenu() {
+        // Future implementation for mobile menu
+        console.log('Mobile menu toggle - future feature');
+    }
+
+    /**
+     * Highlight word and its corresponding clue with smooth scrolling
      */
     highlightWord(wordNum) {
         this.clearHighlights();
@@ -379,6 +641,15 @@ class CrosswordPuzzle {
         
         clueElement.classList.add(this.CONFIG.CSS_CLASSES.CLUE_ACTIVE);
         this.highlightWordCells(word);
+
+        // Scroll clue into view on mobile
+        if (this.isMobile) {
+            clueElement.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'nearest',
+                inline: 'nearest' 
+            });
+        }
     }
 
     /**
@@ -420,6 +691,17 @@ class CrosswordPuzzle {
         const cellData = this.gridState[r][c];
         
         if (!cellData) return;
+        
+        // Scroll focused cell into view on mobile
+        if (this.isMobile) {
+            setTimeout(() => {
+                e.target.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center',
+                    inline: 'center' 
+                });
+            }, 100);
+        }
         
         if (cellData.inputs.length > 1) {
             // Handle intersecting words - choose by active direction preference
@@ -468,11 +750,13 @@ class CrosswordPuzzle {
         if (!e.target.value) return;
         
         const nextInput = this.getNextInput(r, c, this.activeDirection);
-        if (nextInput) nextInput.focus();
+        if (nextInput) {
+            setTimeout(() => nextInput.focus(), 50); // Slight delay for better mobile experience
+        }
     }
 
     /**
-     * Handle keyboard navigation
+     * Handle keyboard navigation with mobile improvements
      */
     handleKeyDown(e) {
         const r = parseInt(e.target.dataset.row);
@@ -497,6 +781,7 @@ class CrosswordPuzzle {
                 this.activeDirection = this.CONFIG.DIRECTIONS.DOWN;
                 break;
             case 'Backspace':
+            case 'Delete':
                 if (!e.target.value) {
                     nextInput = this.getPreviousInput(r, c, this.activeDirection);
                 }
@@ -504,12 +789,30 @@ class CrosswordPuzzle {
             case 'Tab':
                 // Allow default tab behavior for accessibility
                 return;
+            case 'Enter':
+                // Switch direction on enter key
+                this.activeDirection = this.activeDirection === this.CONFIG.DIRECTIONS.ACROSS 
+                    ? this.CONFIG.DIRECTIONS.DOWN 
+                    : this.CONFIG.DIRECTIONS.ACROSS;
+                this.highlightWord(this.findWordAtPosition(r, c, this.activeDirection));
+                break;
         }
         
         if (nextInput) {
             e.preventDefault();
             nextInput.focus();
         }
+    }
+
+    /**
+     * Find word at specific position and direction
+     */
+    findWordAtPosition(row, col, direction) {
+        const cellData = this.gridState[row][col];
+        if (!cellData) return null;
+        
+        const wordInfo = cellData.inputs.find(input => input.direction === direction);
+        return wordInfo ? wordInfo.wordNum : null;
     }
 
     /**
@@ -548,6 +851,7 @@ class CrosswordPuzzle {
     checkAnswers() {
         this.removeFeedback();
         let correctCount = 0;
+        let totalCells = this.allInputs.length;
         
         this.allInputs.forEach(input => {
             const r = parseInt(input.dataset.row);
@@ -562,16 +866,58 @@ class CrosswordPuzzle {
             }
         });
         
-        if (correctCount === this.allInputs.length) {
+        // Show progress feedback
+        const progress = Math.round((correctCount / totalCells) * 100);
+        
+        if (correctCount === totalCells) {
             this.showCompletionMessage();
+        } else {
+            this.showProgressMessage(progress, correctCount, totalCells);
         }
+    }
+
+    /**
+     * Show progress message
+     */
+    showProgressMessage(progress, correct, total) {
+        const message = `Progress: ${progress}% complete (${correct}/${total} correct)`;
+        
+        if (this.isMobile) {
+            // Use a less intrusive notification for mobile
+            this.showToast(message);
+        } else {
+            alert(message);
+        }
+    }
+
+    /**
+     * Show toast notification for mobile
+     */
+    showToast(message) {
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-4 py-2 rounded-lg z-50 transition-all duration-300';
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        // Show and hide toast
+        setTimeout(() => toast.classList.add('opacity-0'), 2000);
+        setTimeout(() => document.body.removeChild(toast), 2500);
     }
 
     /**
      * Show completion message
      */
     showCompletionMessage() {
-        alert('🎉 Congratulations! You have successfully completed this crossword puzzle!');
+        const message = '🎉 Congratulations! You have successfully completed this crossword puzzle!';
+        
+        if (this.isMobile) {
+            this.showToast('🎉 Puzzle Complete!');
+            // Optional: Add celebration animation or effects
+        } else {
+            alert(message);
+        }
     }
 
     /**
@@ -584,6 +930,10 @@ class CrosswordPuzzle {
             const c = parseInt(input.dataset.col);
             input.value = this.gridState[r][c].letter || '';
         });
+        
+        if (this.isMobile) {
+            this.showToast('All answers revealed!');
+        }
     }
 
     /**
@@ -593,6 +943,10 @@ class CrosswordPuzzle {
         this.removeFeedback();
         this.allInputs.forEach(input => input.value = '');
         this.highlightWord(null);
+        
+        if (this.isMobile) {
+            this.showToast('Puzzle reset!');
+        }
     }
 }
 
@@ -600,6 +954,14 @@ class CrosswordPuzzle {
 document.addEventListener('DOMContentLoaded', () => {
     new CrosswordPuzzle();
 });
+
+// Handle iOS viewport height issues
+if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+    window.addEventListener('resize', () => {
+        document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+    });
+    document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+}
 </script>
 </body>
 </html>
